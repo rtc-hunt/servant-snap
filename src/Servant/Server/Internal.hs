@@ -513,6 +513,7 @@ instance (HasServer api context m,
 ct_wildcard :: B.ByteString
 ct_wildcard = "*" <> "/" <> "*" -- Because CPP
 
+{-
 instance ( MimeRender ctype a, ReflectMethod method, MimeRender ctype a, -- ToStreamGenerator m (f a),
            FramingRender framing ctype, ToStreamGenerator f a
          ) => HasServer (Stream method framing ctype (f a)) context m where
@@ -582,3 +583,4 @@ streamRouter splitHeaders method handlerProxy framingproxy ctypeproxy action = l
                                     in  k go go
                       IOS.write (Just . BB.lazyByteString $ trailer framingproxy ctypeproxy) outStream
                       return outStream
+-}
