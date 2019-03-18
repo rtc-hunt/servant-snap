@@ -25,6 +25,7 @@ import           Data.CaseInsensitive                (CI)
 import qualified Data.List                           as L
 import           Data.Proxy                          (Proxy(..))
 import           Network.HTTP.Types                  (Status(..))
+-- import           Network.URI                         (unEscapeString)
 import qualified System.IO.Streams                   as Streams
 import           Servant.Server.Internal.SnapShims
 import           Servant.Server.Internal.ServantErr
@@ -192,7 +193,7 @@ addCapture :: forall env a b captured m. Monad m => Delayed m env (a -> b)
            -> Delayed m (captured, env) b
 addCapture Delayed{..} new =
   Delayed
-    { capturesD = \ (txt, env) -> (,) <$> capturesD env <*> new txt
+    { capturesD = \ (txt, env) -> (,) <$> capturesD env <*> (new) txt
     , serverD   = \ (x, v) a b req -> ($ v) <$> serverD x a b req
     , ..
     } -- Note [Existential Record Update]

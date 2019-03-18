@@ -39,7 +39,7 @@ import           Data.Maybe                  (fromMaybe, isNothing, mapMaybe,
 import           Data.Proxy
 import           Data.String                 (fromString)
 import           Data.String.Conversions     (cs, (<>))
-import           Data.Text                   (Text)
+import           Data.Text                   (Text, unpack, pack)
 import           GHC.Generics
 import           GHC.TypeLits                (KnownNat, KnownSymbol, natVal,
                                               symbolVal)
@@ -48,6 +48,7 @@ import           Network.HTTP.Types          (HeaderName, Method,
                                               methodGet, methodHead,
                                               hContentType, hAccept)
 import qualified Network.HTTP.Media          as NHM
+import qualified Network.URI                 as NU
 import           Web.HttpApiData             (FromHttpApiData,
                                               parseHeaderMaybe,
                                               parseQueryParamMaybe,
@@ -146,7 +147,7 @@ instance (FromHttpApiData a, HasServer sublayout context m)
   route Proxy ctx d =
     CaptureRouter $
       route (Proxy :: Proxy sublayout) ctx
-        (addCapture d $ \ txt -> case parseUrlPieceMaybe txt of
+        (addCapture d $ \ txt -> case parseUrlPieceMaybe $ pack $ NU.unEscapeString $ unpack txt of
                                    Nothing -> delayedFail err400
                                    Just v  -> return v
         )
@@ -161,7 +162,7 @@ instance (FromHttpApiData a, HasServer sublayout context m)
   route Proxy ctx d =
     CaptureAllRouter $
         route (Proxy :: Proxy sublayout) ctx
-              (addCapture d $ \ txts -> case parseUrlPieces txts of
+              (addCapture d $ \ txts -> case parseUrlPieces $ pack . NU.unEscapeString . unpack <$> txts of
                  Left _  -> delayedFail err400
                  Right v -> return v
               )
